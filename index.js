@@ -88,6 +88,7 @@ async function converterAndroid(db, collections) {
         }
 
         let counter = 0
+
         let enContent = []
         let ukContent = []
 
@@ -104,12 +105,15 @@ async function converterAndroid(db, collections) {
             }
 
             if (counter === collections.length) {
+                const prefix = '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n\n'
+                const postfix = '\n\n</resources>'
+
                 const enFileName = './localization-artifacts/localization-en.xml'
                 const ukFileName = `./localization-artifacts/localization-uk.xml`
 
-                await fs.writeFile(enFileName, enContent.join('\n'))
+                await fs.writeFile(enFileName, [prefix, ...enContent, postfix].join('\n'))
                 console.log(`✅ Updated - ${enFileName}`);
-                await fs.writeFile(ukFileName, ukContent.join('\n'))
+                await fs.writeFile(ukFileName, [prefix, ...ukContent, postfix].join('\n'))
                 console.log(`✅ Updated - ${ukFileName}`);
                 console.log(`\n\n😈 Complete!`);
                 resolve()
