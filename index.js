@@ -1,16 +1,15 @@
 const fs = require('fs').promises
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const [, , platform] = process.argv
-const { DB_PASSWORD } = process.env
+const { DB_PASSWORD, PLATFORM } = process.env
 
 if (!DB_PASSWORD) {
     console.log('❗️ Please provide DB_PASSWORD env variable');
     process.exit(1)
 }
 
-if (platform !== 'js' && platform !== 'android' && platform !== 'ios') {
-    console.log(`❗️ Please specify a target platform (js/android/ios)`)
+if (PLATFORM !== 'js' && PLATFORM !== 'android' && PLATFORM !== 'ios') {
+    console.log(`❗️ Please specify a target platform (PLATFORM=js|android|ios)`)
     process.exit(1)
 }
 
@@ -20,14 +19,14 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
-        const db = await client.db("app"/* platform === "js" ? "web" : "app" */);
+        const db = await client.db(PLATFORM === "js" ? "web" : "app");
         const collections = await db.listCollections().toArray()
 
-        if (platform === 'js') {
+        if (PLATFORM === 'js') {
             await converterJs(db, collections)
         }
 
-        if (platform === 'android') {
+        if (PLATFORM === 'android') {
             await converterAndroid(db, collections)
         }
 
